@@ -17,6 +17,7 @@ export default function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -50,6 +51,7 @@ export default function FloatingChat() {
 
     setTimeout(() => {
       let botReply = "Maaf, saya masih dalam tahap purwarupa demo. Namun, saya terus belajar untuk membantu Anda mengelola anggrek dengan lebih baik!";
+      
       const lowerText = text.toLowerCase();
       
       if (lowerText.includes("zona c") || lowerText.includes("panas")) {
@@ -73,22 +75,25 @@ export default function FloatingChat() {
   };
 
   return (
-    <div className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-[60] flex flex-col items-end">
+    // 1. PERBAIKAN JARAK BAWAH: Menggunakan bottom-24 agar lebih lega dari bottom bar di HP
+    <div className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-[60]">
       
-      {/* Container Chat dengan Animasi yang Diperbaiki */}
+      {/* 2. PERBAIKAN ANIMASI JENDELA CHAT */}
       <div 
         className={cn(
-          // KUNCI ANIMASI: transform origin di bottom-right agar mengecil ke arah tombol
-          "mb-4 origin-bottom-right transition-all duration-300",
+          "absolute bottom-16 right-0 mb-2 origin-bottom-right transition-all duration-300 ease-out",
+          // Jika Buka: Skala 100%, Posisi Pas, Terlihat
           isOpen 
-            ? "scale-100 opacity-100 translate-y-0 visible" // Saat Buka: Muncul utuh
-            : "scale-75 opacity-0 translate-y-4 invisible absolute" // Saat Tutup: Mengecil (scale-75), Turun sedikit (translate-y), dan memudar
+            ? "scale-100 opacity-100 translate-y-0 pointer-events-auto" 
+            // Jika Tutup: Skala mengecil sedikit (75%), turun ke bawah sedikit, dan memudar (tidak sampai hilang layoutnya)
+            : "scale-75 opacity-0 translate-y-4 pointer-events-none"
         )}
       >
         <Card className="w-[320px] sm:w-[360px] overflow-hidden border-slate-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-950 flex flex-col">
           
           <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl"></div>
+            
             <div className="flex items-center gap-3 relative z-10">
               <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm border border-white/30">
                 <Bot className="w-5 h-5 text-white" />
@@ -101,6 +106,7 @@ export default function FloatingChat() {
                 </div>
               </div>
             </div>
+            
             <Button 
               variant="ghost" 
               size="icon" 
@@ -112,6 +118,7 @@ export default function FloatingChat() {
           </div>
 
           <div className="h-[320px] p-4 overflow-y-auto bg-slate-50 dark:bg-zinc-900/50 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-700">
+            
             <div className="text-center mt-2 mb-2">
               <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-200/50 dark:bg-zinc-800 px-2 py-1 rounded-full uppercase tracking-wider">
                 Hari ini
@@ -128,6 +135,7 @@ export default function FloatingChat() {
                 )}>
                   {msg.sender === "user" ? <User className="w-3.5 h-3.5 text-slate-500" /> : <Bot className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
                 </div>
+
                 <div className={cn(
                   "p-3 shadow-sm",
                   msg.sender === "user"
@@ -171,6 +179,7 @@ export default function FloatingChat() {
                 </div>
               </div>
             )}
+            
             <div ref={messagesEndRef} />
           </div>
 
@@ -202,30 +211,29 @@ export default function FloatingChat() {
               </Button>
             </form>
           </div>
+
         </Card>
       </div>
 
-      {/* Floating Action Button (FAB) dengan transisi rotasi yang mulus */}
+      {/* FAB Button (Absolute handling) */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105",
+          "relative w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 z-10",
           isOpen 
             ? "bg-slate-200 hover:bg-slate-300 text-slate-600 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-slate-300 rotate-90" 
             : "bg-emerald-600 hover:bg-emerald-700 text-white rotate-0"
         )}
       >
-        {/* Menggunakan animasi yang memudar masuk/keluar saat rotasi */}
-        <div className="relative w-6 h-6 flex items-center justify-center">
-          <X className={cn("absolute w-6 h-6 transition-all duration-300", isOpen ? "opacity-100 scale-100" : "opacity-0 scale-0")} />
-          <div className={cn("absolute transition-all duration-300", !isOpen ? "opacity-100 scale-100" : "opacity-0 scale-0")}>
+        {isOpen ? <X className="w-6 h-6" /> : (
+          <div className="relative">
             <MessageCircle className="w-6 h-6" />
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-emerald-600"></span>
             </span>
           </div>
-        </div>
+        )}
       </Button>
 
     </div>

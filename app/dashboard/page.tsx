@@ -4,6 +4,7 @@ import WeatherWidget from "@/components/dashboard/WeatherWidget";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Activity, ThermometerSun } from "lucide-react";
+import SystemStatus from "@/components/dashboard/SystemStatus";
 
 export default function DashboardPage() {
   return (
@@ -20,31 +21,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Status Sistem IoT & Bot */}
-        <Card className="shadow-sm border-slate-200 dark:border-zinc-800 flex flex-col justify-between w-full">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-bold flex items-center gap-2">
-              <Activity className="w-5 h-5 text-green-500" />
-              Status Sistem
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">ESP32 Controller</span>
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20">
-                Online
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Bot WhatsApp</span>
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20">
-                Terkoneksi
-              </Badge>
-            </div>
-            <div className="pt-2 border-t border-slate-100 dark:border-zinc-800">
-              <p className="text-xs text-slate-500 font-mono">Terakhir sinkronisasi: Baru saja</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex">
+          <SystemStatus />
+        </div>
       </div>
 
       {/* 3. Grid Zonasi (ESP32) */}

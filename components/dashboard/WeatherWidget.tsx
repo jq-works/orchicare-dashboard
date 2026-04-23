@@ -1,4 +1,3 @@
-// components/dashboard/WeatherWidget.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -10,7 +9,7 @@ interface WeatherData {
   humidity: string;
   weather: string;
   windSpeed: string;
-  locationName: string; // Mengubah 'city' menjadi 'locationName' agar lebih representatif
+  locationName: string;
 }
 
 export default function WeatherWidget() {
@@ -35,27 +34,19 @@ export default function WeatherWidget() {
           const geoData = await geoRes.json();
           const address = geoData.address;
 
-          // 1. Ambil data Kecamatan (biasanya ada di city_district, suburb, atau town)
           const kecamatanRaw = address.city_district || address.suburb || address.village || "";
-          
-          // 2. Ambil data Kota/Kabupaten
           const kotaRaw = address.city || address.town || address.regency || "Lokasi Tidak Diketahui";
-
-          // 3. Bersihkan string agar tidak ada kata ganda (misal: "Kecamatan Kecamatan Blimbing")
           const cleanKecamatan = kecamatanRaw.replace(/Kecamatan /ig, "");
           const cleanKota = kotaRaw.replace(/Kota /ig, "").replace(/Kabupaten /ig, "");
 
-          // 4. Gabungkan Formatnya: "Kecamatan, Kota"
-          const finalLocation = cleanKecamatan 
-            ? `${cleanKecamatan}, ${cleanKota}` 
-            : cleanKota;
+          const finalLocation = cleanKecamatan ? `${cleanKecamatan}, ${cleanKota}` : cleanKota;
 
           const mockWeather = {
             temp: "28°C",
             humidity: "75%",
             weather: "Cerah Berawan",
             windSpeed: "12 km/h",
-            locationName: finalLocation, // Sekarang berisi misal: "Blimbing, Malang" atau "Lowokwaru, Malang"
+            locationName: finalLocation,
           };
 
           setData(mockWeather);
@@ -74,10 +65,10 @@ export default function WeatherWidget() {
 
   if (loading) {
     return (
-      <Card className="w-full flex items-center justify-center border-slate-200 dark:border-zinc-800 shadow-sm min-h-[200px]">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-          <p className="text-sm text-slate-500">Mendeteksi Lokasi Greenhouse...</p>
+      <Card className="w-full h-full flex items-center justify-center border-slate-200 dark:border-zinc-800 shadow-sm min-h-[250px] bg-gradient-to-br from-white to-slate-50 dark:from-zinc-950 dark:to-zinc-900">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
+          <p className="text-base text-slate-500 animate-pulse font-medium">Mendeteksi Lokasi Greenhouse...</p>
         </div>
       </Card>
     );
@@ -85,79 +76,68 @@ export default function WeatherWidget() {
 
   if (error) {
     return (
-      <Card className="w-full flex items-center justify-center border-red-100 bg-red-50 dark:bg-red-950/20 dark:border-red-900 shadow-sm min-h-[200px]">
-        <p className="text-sm text-red-600 dark:text-red-400 p-4 text-center">{error}</p>
+      <Card className="w-full h-full flex items-center justify-center border-red-100 bg-red-50 dark:bg-red-950/20 dark:border-red-900 shadow-sm min-h-[250px]">
+        <p className="text-base text-red-600 dark:text-red-400 p-6 text-center font-medium">{error}</p>
       </Card>
     );
   }
 
   return (
-    <Card className="w-full flex flex-col border-slate-200 dark:border-zinc-800 shadow-sm">
-      <CardHeader className="pb-3 border-b border-slate-100 dark:border-zinc-800/50">
-        <CardTitle className="text-lg font-bold flex items-center gap-2">
+    <Card className="w-full flex flex-col border-slate-200 dark:border-zinc-800 shadow-sm h-full bg-gradient-to-br from-white to-slate-50 dark:from-zinc-950 dark:to-zinc-900">
+      {/* Header diperbesar sedikit (py-4 px-6) */}
+      <CardHeader className="py-4 px-6 border-b border-slate-100 dark:border-zinc-800/50">
+        <CardTitle className="text-lg font-bold flex items-center gap-2.5 text-slate-800 dark:text-slate-100">
           <CloudRain className="w-5 h-5 text-blue-500" />
           Kondisi Lingkungan (BMKG)
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="p-0 flex-1 flex flex-col">
-        <div className="grid grid-cols-1 md:grid-cols-5 flex-1">
-          {/* Sisi Kiri: Status Utama */}
-          <div className="md:col-span-2 p-6 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-100 dark:border-zinc-800">
-            <div className="flex items-center gap-2 text-green-700 dark:text-green-400 font-semibold mb-4">
-              <MapPin className="w-4 h-4 shrink-0" />
-              {/* Tambahkan line-clamp jika nama kecamatannya terlalu panjang */}
-              <span className="text-sm uppercase tracking-wider line-clamp-2 leading-tight">
-                {data?.locationName}
-              </span>
-            </div>
-            
-            <div className="flex items-center gap-4 mb-2">
-              <Sun className="w-12 h-12 text-orange-500 drop-shadow-sm" />
-              <div>
-                <h3 className="text-4xl font-bold tracking-tighter">{data?.temp}</h3>
-                <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mt-1">{data?.weather}</p>
-              </div>
-            </div>
-
-            <p className="text-[10px] text-slate-400 mt-4">Sumber: Data Terbuka BMKG</p>
+      <CardContent className="p-0 flex-1 grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-slate-100 dark:divide-zinc-800/50">
+        
+        {/* Sisi Kiri: Status Utama */}
+        {/* Padding dilonggarkan menjadi p-6 lg:p-8 */}
+        <div className="lg:col-span-2 p-6 lg:p-8 flex flex-col justify-center bg-transparent">
+          <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-500 font-bold mb-4">
+            <MapPin className="w-4 h-4 shrink-0" />
+            <span className="text-sm uppercase tracking-wider line-clamp-1">
+              {data?.locationName}
+            </span>
           </div>
-
-          {/* Sisi Kanan: Detail Parameter (Tetap Sama) */}
-          <div className="md:col-span-3 p-6 grid grid-cols-2 gap-y-6 gap-x-4 content-center">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                <Droplets className="w-4 h-4 text-blue-500" />
-                <span className="text-xs font-medium uppercase tracking-wider">Kelembapan</span>
-              </div>
-              <p className="text-xl font-bold">{data?.humidity}</p>
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                <Wind className="w-4 h-4 text-slate-400" />
-                <span className="text-xs font-medium uppercase tracking-wider">Kecepatan Angin</span>
-              </div>
-              <p className="text-xl font-bold">{data?.windSpeed}</p>
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                <ThermometerSun className="w-4 h-4 text-orange-400" />
-                <span className="text-xs font-medium uppercase tracking-wider">UV Index</span>
-              </div>
-              <p className="text-xl font-bold">Sedang</p>
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                <Cloud className="w-4 h-4 text-blue-400" />
-                <span className="text-xs font-medium uppercase tracking-wider">Presipitasi</span>
-              </div>
-              <p className="text-xl font-bold">10%</p>
+          
+          <div className="flex items-center gap-5 mb-4">
+            <Sun className="w-16 h-16 text-orange-500 drop-shadow-sm" />
+            <div>
+              {/* Teks Suhu membesar dari 4xl ke 6xl */}
+              <h3 className="text-6xl font-extrabold tracking-tighter text-slate-800 dark:text-slate-100 leading-none">{data?.temp}</h3>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mt-2">{data?.weather}</p>
             </div>
           </div>
+          
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-6 font-bold uppercase tracking-wider">Sumber: Data Terbuka BMKG</p>
         </div>
+
+        {/* Sisi Kanan: Detail Parameter */}
+        {/* Gap antar item dijauhkan dan padding membesar */}
+        <div className="lg:col-span-3 p-6 lg:p-8 grid grid-cols-2 gap-y-8 gap-x-6 place-content-center bg-transparent">
+          
+          {[
+            { icon: Droplets, label: "Kelembapan", val: data?.humidity, color: "text-blue-500" },
+            { icon: Wind, label: "Kec. Angin", val: data?.windSpeed, color: "text-slate-400" },
+            { icon: ThermometerSun, label: "UV Index", val: "Sedang", color: "text-orange-400" },
+            { icon: Cloud, label: "Presipitasi", val: "10%", color: "text-blue-400" },
+          ].map((item, idx) => (
+            <div key={idx} className="space-y-2">
+              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                <item.icon className={`w-4 h-4 ${item.color}`} />
+                <span className="text-xs font-bold uppercase tracking-wider">{item.label}</span>
+              </div>
+              {/* Nilai diperbesar dari xl menjadi 3xl */}
+              <p className="text-3xl font-bold text-slate-800 dark:text-slate-100 leading-none">{item.val}</p>
+            </div>
+          ))}
+          
+        </div>
+
       </CardContent>
     </Card>
   );

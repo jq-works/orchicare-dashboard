@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 // Menyembunyikan opsi setting di mobile bottom bar untuk menghemat space
 // Setting bisa diakses dari halaman Profile
 const bottomNavItems = [
-  { name: "Home", href: "/", icon: Home },
+  { name: "Home", href: "/dashboard", icon: Home },
   { name: "Zonasi", href: "/zones", icon: LayoutGrid },
   { name: "AI Lab", href: "/ai-lab", icon: Camera },
   { name: "Profil", href: "/profile", icon: User },

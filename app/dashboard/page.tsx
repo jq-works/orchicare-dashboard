@@ -1,59 +1,67 @@
 // app/(dashboard)/page.tsx
-import AIBanner from "@/components/dashboard/AIBanner";
 import WeatherWidget from "@/components/dashboard/WeatherWidget";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Activity, ThermometerSun } from "lucide-react";
 import SystemStatus from "@/components/dashboard/SystemStatus";
+import GlobalHealthScore from "@/components/dashboard/GlobalHealthScore";
+import ZoneCard from "@/components/dashboard/ZoneCard";
+import AIInsightDrawer from "@/components/dashboard/AIInsightDrawer"; // Komponen Drawer AI
+import { Badge } from "@/components/ui/badge";
 
 export default function DashboardPage() {
+  const zones = [
+    { id: "A", data: { temp: 28, humidity: 75, light: 60, moisture: 85 } },
+    { id: "B", data: { temp: 29, humidity: 72, light: 55, moisture: 40 } },
+    { id: "C", data: { temp: 34, humidity: 65, light: 90, moisture: 25 } }, 
+    { id: "D", data: { temp: 27, humidity: 80, light: 40, moisture: 90 } },
+  ];
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* 1. Top Banner AI */}
-      <AIBanner />
-
-      {/* 2. Grid Cuaca & Status Sistem */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      {/* Header Halaman & Trigger AI Drawer */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Overview Dashboard</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Pantau kondisi greenhouse dan analisis AI real-time.</p>
+        </div>
         
-        {/* Widget Cuaca (Sekarang komponen mengatur Card-nya sendiri) */}
+        {/* Tombol AI Insight pindah ke sini */}
+        <AIInsightDrawer />
+      </div>
+
+      {/* BARIS 1: Hero Section - Global Health Score */}
+      <div className="w-full">
+        <GlobalHealthScore />
+      </div>
+
+      {/* BARIS 2: Cuaca & Status Hardware */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 flex">
           <WeatherWidget />
         </div>
-
-        {/* Status Sistem IoT & Bot */}
-        <div className="flex">
+        <div className="flex h-full">
           <SystemStatus />
         </div>
       </div>
 
-      {/* 3. Grid Zonasi (ESP32) */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-bold tracking-tight">Pemantauan Zona</h3>
+      {/* BARIS 3: Pemantauan Detail per Zona */}
+      <section className="space-y-4 pt-4">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-zinc-800 pb-2">
+          <div className="space-y-1">
+            <h3 className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100">Pemantauan Zona</h3>
+            <p className="text-xs text-slate-500 font-medium">Klik pada zona untuk melihat skor spesifik</p>
+          </div>
           <Badge className="bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400">
             4 Zona Aktif
           </Badge>
         </div>
         
-        {/* Placeholder Zone Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((zone) => (
-            <Card key={zone} className="shadow-sm border-slate-200 dark:border-zinc-800">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-md flex items-center gap-2">
-                  <ThermometerSun className="w-4 h-4 text-orange-500" />
-                  Zona {String.fromCharCode(64 + zone)}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                 <div className="h-32 flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-zinc-800 rounded-lg bg-slate-50 dark:bg-zinc-900/50">
-                  <span className="text-xs text-slate-500 text-center px-2">Komponen Indikator Sensor<br/>(Suhu, Kelembapan, Cahaya, Air)</span>
-                </div>
-              </CardContent>
-            </Card>
+          {zones.map((zone) => (
+            <ZoneCard key={zone.id} name={zone.id} data={zone.data} />
           ))}
         </div>
-      </div>
+      </section>
+
     </div>
   );
 }

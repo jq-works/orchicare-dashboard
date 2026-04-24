@@ -22,7 +22,7 @@ export default function ZonesPage() {
 
   // Fungsi Toggle Aktuator Individu
   const toggleDevice = (zoneId: string, device: string) => {
-    setZones(zones.map(z => z.id === zoneId ? { ...z, devices: { ...z.devices, [device]: !z.devices[device] } } : z));
+    setZones(zones.map(z => z.id === zoneId ? { ...z, devices: { ...z.devices, [device]: !(z.devices as Record<string, boolean>)[device] } } : z));
   };
 
   // Fungsi Makro

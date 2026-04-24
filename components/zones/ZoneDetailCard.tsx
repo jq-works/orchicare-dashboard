@@ -4,7 +4,36 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Thermometer, Droplets, Sun, Waves, AlertTriangle, Power, Fan, Lightbulb, Zap, BatteryCharging, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function ZoneDetailCard({ zone, onToggle }: any) {
+interface Zone {
+  id: string;
+  name: string;
+  status: string;
+  score: number;
+  power: {
+    mode: string;
+    battery?: number;
+  };
+  metrics: {
+    temp: number;
+    humidity: number;
+    light: number;
+    moisture: number;
+  };
+  devices: {
+    pump: boolean;
+    misting: boolean;
+    uvLight: boolean;
+    [key: string]: boolean;
+  };
+  aiInsight: string;
+}
+
+interface ZoneDetailCardProps {
+  zone: Zone;
+  onToggle: (zoneId: string, device: string) => void;
+}
+
+export default function ZoneDetailCard({ zone, onToggle }: ZoneDetailCardProps) {
   const isWarn = zone.status === "warning";
 
   return (

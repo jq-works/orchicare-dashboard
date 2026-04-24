@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, BellAlert, Save } from "lucide-react";
+import { BrainCircuit, BellRing, Save } from "lucide-react";
 
 export default function AISettings() {
   return (
@@ -31,7 +31,7 @@ export default function AISettings() {
         <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50">
           <div>
             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-               Notifikasi WhatsApp
+               <BellRing className="w-4 h-4 text-emerald-500" /> Notifikasi WhatsApp
             </h4>
             <p className="text-xs text-slate-500 mt-1">Terima peringatan ke perangkat seluler via bot WA.</p>
           </div>

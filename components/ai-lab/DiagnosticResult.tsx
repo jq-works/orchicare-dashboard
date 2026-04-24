@@ -5,9 +5,18 @@ import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, AlertCircle, CheckCircle2, Camera, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+export interface DiagnosticData {
+  species?: string;
+  accuracy?: number;
+  healthScore?: number;
+  disease?: string;
+  diseaseDetail?: string;
+  recommendations?: string[];
+}
+
 interface DiagnosticResultProps {
   status: string;
-  data: any; // Menerima data dari API
+  data: DiagnosticData | null; // Menerima data dari API
   onReset: () => void;
 }
 

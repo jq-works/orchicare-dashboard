@@ -10,7 +10,10 @@ export function ThemeToggle() {
   const [mounted, setMounted] = React.useState(false)
 
   // Mencegah hydration mismatch: render ikon hanya setelah komponen mount di client
-  React.useEffect(() => { setMounted(true) }, [])
+  React.useEffect(() => { 
+    const timer = setTimeout(() => setMounted(true), 0)
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <Button

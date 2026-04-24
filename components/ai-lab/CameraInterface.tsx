@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Camera, Image as ImageIcon, Maximize, RefreshCw, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import type { StatusType } from "@/app/ai-lab/page";
+
 interface CameraInterfaceProps {
-  status: string;
-  setStatus: (val: any) => void;
+  status: StatusType;
+  setStatus: (val: StatusType) => void;
   setCapturedImage: (val: string | null) => void;
 }
 
@@ -25,7 +27,7 @@ export default function CameraInterface({ status, setStatus, setCapturedImage }:
     }
   };
 
-  const startCamera = async () => {
+  const startCamera = React.useCallback(async () => {
     setIsStarting(true);
     setError("");
     try {
@@ -43,14 +45,17 @@ export default function CameraInterface({ status, setStatus, setCapturedImage }:
     } finally {
       setIsStarting(false);
     }
-  };
+  }, [setStatus]);
 
   // PERBAIKAN: Auto-start kamera jika status disuruh "request-camera" dari tombol Scan Ulang
   useEffect(() => {
     if (status === "request-camera") {
-      startCamera();
+      const timer = setTimeout(() => {
+        startCamera();
+      }, 0);
+      return () => clearTimeout(timer);
     }
-  }, [status]);
+  }, [status, startCamera]);
 
   const takePhoto = () => {
     if (videoRef.current && canvasRef.current) {
@@ -93,8 +98,8 @@ export default function CameraInterface({ status, setStatus, setCapturedImage }:
           {error && <div className="bg-red-500/20 p-3 rounded-lg text-red-300 text-xs mb-4">{error}</div>}
 
           {/* PERBAIKAN: Tombol ini sekarang hanya mengubah status, memicu useEffect di atas */}
-          <Button onClick={() => setStatus("request-camera")} disabled={isStarting || status === "request-camera"} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-6 rounded-full w-full max-w-[200px]">
-            {isStarting || status === "request-camera" ? <Loader2 className="w-5 h-5 animate-spin" /> : "Buka Kamera"}
+          <Button onClick={() => setStatus("request-camera")} disabled={isStarting} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-6 rounded-full w-full max-w-[200px]">
+            {isStarting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Buka Kamera"}
           </Button>
         </div>
       )}

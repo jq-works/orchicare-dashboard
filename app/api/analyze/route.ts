@@ -55,8 +55,9 @@ export async function POST(req: Request) {
       finalJsonData = extractJSON(result.response.text());
       console.log("✅ Berhasil menggunakan Gemini!");
 
-    } catch (geminiError: any) {
-      console.warn("⚠️ Gemini Gagal/Sibuk (", geminiError.message.substring(0, 50), "...). Mengaktifkan Failover ke GROQ!");
+    } catch (geminiError: unknown) {
+      const err = geminiError as Error;
+      console.warn("⚠️ Gemini Gagal/Sibuk (", err.message.substring(0, 50), "...). Mengaktifkan Failover ke GROQ!");
 
       // ==========================================
       // SISTEM 2: AUTO-FAILOVER KE GROQ (LLAMA 3.2 VISION)
@@ -74,7 +75,7 @@ export async function POST(req: Request) {
             ]
           }
         ],
-        model: "meta-llama/llama-4-scout-17b-16e-instruct",
+        model: "llama-3.2-11b-vision-preview",
         response_format: { type: "json_object" }, // Fitur khusus Groq agar wajib membalas JSON
       });
 
@@ -90,11 +91,12 @@ export async function POST(req: Request) {
 
     return NextResponse.json(finalJsonData);
 
-  } catch (error: any) {
-    console.error("❌ Fatal Error:", error.message);
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error("❌ Fatal Error:", err.message);
     return NextResponse.json({ 
       error: "Sistem AI Gagal", 
-      details: error.message 
+      details: err.message 
     }, { status: 500 });
   }
 }

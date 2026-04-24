@@ -3,18 +3,18 @@
 import React, { useState, useEffect } from "react";
 import CameraInterface from "@/components/ai-lab/CameraInterface";
 import ScannerAnimation from "@/components/ai-lab/ScannerAnimation";
-import DiagnosticResult from "@/components/ai-lab/DiagnosticResult";
+import DiagnosticResult, { type DiagnosticData } from "@/components/ai-lab/DiagnosticResult";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, History, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Tambahkan "request-camera" ke dalam StatusType
-type StatusType = "idle" | "request-camera" | "camera-active" | "scanning" | "result";
+export type StatusType = "idle" | "request-camera" | "camera-active" | "scanning" | "result";
 
 export default function AiLabPage() {
   const [status, setStatus] = useState<StatusType>("idle");
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [diagnosticData, setDiagnosticData] = useState<any>(null);
+  const [diagnosticData, setDiagnosticData] = useState<DiagnosticData | null>(null);
 
   useEffect(() => {
     if (status === "scanning" && capturedImage) {
@@ -39,9 +39,10 @@ export default function AiLabPage() {
           const data = await response.json();
           setDiagnosticData(data);
           setStatus("result");
-        } catch (error: any) {
-          console.error("Fetch Error:", error);
-          const errorMsg = error.message || "";
+        } catch (error: unknown) {
+          const err = error as Error;
+          console.error("Fetch Error:", err);
+          const errorMsg = err.message || "";
           
           const isRateLimit = errorMsg.includes("429") || errorMsg.includes("Quota") || errorMsg.includes("Too Many Requests");
           const isBusy = errorMsg.includes("503");

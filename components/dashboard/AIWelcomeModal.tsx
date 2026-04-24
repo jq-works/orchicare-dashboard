@@ -17,21 +17,26 @@ export default function AIWelcomeModal() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    const timerClient = setTimeout(() => setIsClient(true), 0);
     
     // Cek apakah modal sudah pernah ditampilkan pada sesi browser ini
     const hasSeenModal = sessionStorage.getItem("orchi_ai_welcome_seen");
 
+    let timerOpen: NodeJS.Timeout;
+
     // Jika belum pernah melihat modal
     if (!hasSeenModal) {
-      const timer = setTimeout(() => {
+      timerOpen = setTimeout(() => {
         setIsOpen(true);
         // Tandai bahwa pengguna sudah melihat modal ini
         sessionStorage.setItem("orchi_ai_welcome_seen", "true");
       }, 1000);
-
-      return () => clearTimeout(timer);
     }
+
+    return () => {
+      clearTimeout(timerClient);
+      if (timerOpen) clearTimeout(timerOpen);
+    };
   }, []);
 
   if (!isClient) return null;

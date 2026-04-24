@@ -19,9 +19,11 @@ export default function WeatherWidget() {
 
   useEffect(() => {
     if (!navigator.geolocation) {
-      setError("Geolocation tidak didukung oleh browser Anda.");
-      setLoading(false);
-      return;
+      const timer = setTimeout(() => {
+        setError("Geolocation tidak didukung oleh browser Anda.");
+        setLoading(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     navigator.geolocation.getCurrentPosition(

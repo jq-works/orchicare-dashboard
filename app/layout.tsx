@@ -39,7 +39,7 @@ export default function RootLayout({
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 md:pl-64 pb-24 md:pb-0">
+            <main className="flex-1 md:pl-64 pt-16 md:pt-0 pb-24 md:pb-0">
               <div className="p-4 md:p-8">
                 {children}
               </div>

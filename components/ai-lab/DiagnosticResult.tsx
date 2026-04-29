@@ -53,21 +53,23 @@ function SeverityBadge({ severity }: { severity?: string }) {
 export default function DiagnosticResult({ status, data, onReset }: DiagnosticResultProps) {
   if (!data && status === "result") return null;
 
-  // Cek apakah tanaman tidak teridentifikasi
+  // Logika cerdas untuk mendeteksi jika yang difoto BUKAN tanaman
   const isUnidentified =
     !data?.species ||
     data.species.toLowerCase().includes("tidak dapat") ||
     data.species.toLowerCase().includes("unknown") ||
-    data.species.toLowerCase().includes("tidak diketahui") ||
+    data.species.toLowerCase().includes("bukan") ||
+    (data.commonName || "").toLowerCase().includes("bukan") ||
     data.accuracy === 0;
 
-  // Sehat hanya jika teridentifikasi DAN severity none DAN score >= 70
+  // Hanya dianggap sehat jika TERIDENTIFIKASI sebagai tanaman
   const isHealthy =
     !isUnidentified &&
     data?.severity === "none" &&
     (data?.disease?.toLowerCase() === "sehat" ||
       (data?.healthScore !== undefined && data.healthScore >= 70));
 
+  // Penyesuaian warna Skor
   const scoreColor = isUnidentified
     ? "text-slate-500 dark:text-slate-400"
     : isHealthy
@@ -76,6 +78,7 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
     ? "text-red-600 dark:text-red-400"
     : "text-orange-600 dark:text-orange-400";
 
+  // Penyesuaian warna border Skor
   const scoreBorder = isUnidentified
     ? "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900"
     : isHealthy
@@ -87,8 +90,9 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
   return (
     <div
       className={cn(
-        "absolute bottom-0 left-0 w-full bg-white dark:bg-zinc-950 rounded-t-3xl transition-transform duration-500 z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] flex flex-col",
-        status === "result" ? "translate-y-0 h-[80%]" : "translate-y-full h-0"
+        // Tema dinamis menggunakan bg-card dan text-card-foreground
+        "absolute bottom-0 left-0 w-full bg-card text-card-foreground rounded-t-3xl md:rounded-t-[40px] transition-transform duration-500 z-40 shadow-[0_-20px_40px_rgba(0,0,0,0.3)] flex flex-col border-t border-border",
+        status === "result" ? "translate-y-0 h-[80%] md:h-[65%]" : "translate-y-full h-0"
       )}
     >
       {/* Handle bar */}
@@ -104,11 +108,11 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
               <ShieldCheck className="w-3 h-3 text-emerald-500" /> Hasil Identifikasi AI
             </p>
-            <h2 className="text-xl font-extrabold text-slate-800 dark:text-slate-100 leading-tight truncate">
+            <h2 className="text-xl font-extrabold text-foreground leading-tight truncate">
               {data?.commonName || data?.species || "Mendeteksi..."}
             </h2>
             {data?.species && data?.commonName && (
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 italic truncate">{data.species}</p>
+              <p className="text-[11px] text-muted-foreground italic truncate">{data.species}</p>
             )}
             <div className="flex items-center gap-2 flex-wrap pt-0.5">
               <Badge className={cn(
@@ -135,7 +139,8 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
         <div className={cn(
           "p-4 rounded-2xl border",
           isUnidentified
-            ? "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800"
+            // Warna abu terang di Light Mode, abu gelap di Dark Mode
+            ? "bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
             : isHealthy
             ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-900/50"
             : "bg-orange-50 dark:bg-orange-900/20 border-orange-100 dark:border-orange-900/50"
@@ -143,7 +148,7 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
           <div className="flex gap-3">
             <div className={cn("p-2 rounded-lg shrink-0 h-fit",
               isUnidentified
-                ? "bg-slate-200/50 text-slate-500"
+                ? "bg-slate-200/80 text-slate-600 dark:bg-slate-700 text-slate-400"
                 : isHealthy
                 ? "bg-emerald-200/50 text-emerald-600"
                 : "bg-orange-200/50 text-orange-600"
@@ -155,16 +160,16 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
                 : <AlertCircle className="w-5 h-5" />}
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+              <h4 className="text-sm font-bold text-foreground">
                 {isUnidentified
-                  ? "Tanaman Tidak Teridentifikasi"
+                  ? "Bukan Tanaman / Tidak Teridentifikasi"
                   : isHealthy
                   ? "Kondisi Sehat"
                   : `Indikasi: ${data?.disease}`}
               </h4>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mt-1.5">
+              <p className="text-xs text-muted-foreground leading-relaxed mt-1.5">
                 {data?.diseaseDetail || (isUnidentified
-                  ? "Arahkan kamera langsung ke tanaman anggrek dengan pencahayaan cukup, lalu scan ulang."
+                  ? "Sistem tidak dapat mengenali objek sebagai tanaman anggrek. Pastikan foto fokus pada daun atau bunga dengan pencahayaan yang cukup."
                   : "Tanaman terlihat optimal.")}
               </p>
             </div>
@@ -172,12 +177,12 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
         </div>
 
         {/* Symptoms */}
-        {data?.symptoms && data.symptoms.length > 0 && (
+        {data?.symptoms && data.symptoms.length > 0 && !isUnidentified && (
           <div className="space-y-2">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gejala Terdeteksi</p>
             <div className="flex flex-wrap gap-2">
               {data.symptoms.map((s, i) => (
-                <span key={i} className="text-[11px] font-medium bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-400 px-2.5 py-1 rounded-full border border-slate-200 dark:border-zinc-700">
+                <span key={i} className="text-[11px] font-medium bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full border border-border">
                   {s}
                 </span>
               ))}
@@ -186,7 +191,7 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
         )}
 
         {/* Care Info */}
-        {data?.careInfo && (
+        {data?.careInfo && !isUnidentified && (
           <div className="space-y-2">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Info Perawatan</p>
             <div className="grid grid-cols-2 gap-2">
@@ -194,8 +199,8 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 rounded-xl p-3 flex gap-2.5 items-start">
                   <Droplets className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-[9px] font-bold text-blue-400 uppercase tracking-wide">Penyiraman</p>
-                    <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-0.5 leading-snug">{data.careInfo.watering}</p>
+                    <p className="text-[9px] font-bold text-blue-500 uppercase tracking-wide">Penyiraman</p>
+                    <p className="text-[11px] text-foreground mt-0.5 leading-snug">{data.careInfo.watering}</p>
                   </div>
                 </div>
               )}
@@ -204,7 +209,7 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
                   <Sun className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-[9px] font-bold text-yellow-500 uppercase tracking-wide">Cahaya</p>
-                    <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-0.5 leading-snug">{data.careInfo.light}</p>
+                    <p className="text-[11px] text-foreground mt-0.5 leading-snug">{data.careInfo.light}</p>
                   </div>
                 </div>
               )}
@@ -213,7 +218,7 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
                   <Wind className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-[9px] font-bold text-teal-500 uppercase tracking-wide">Kelembapan</p>
-                    <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-0.5 leading-snug">{data.careInfo.humidity}</p>
+                    <p className="text-[11px] text-foreground mt-0.5 leading-snug">{data.careInfo.humidity}</p>
                   </div>
                 </div>
               )}
@@ -222,7 +227,7 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
                   <Thermometer className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-[9px] font-bold text-red-400 uppercase tracking-wide">Suhu</p>
-                    <p className="text-[11px] text-slate-700 dark:text-slate-300 mt-0.5 leading-snug">{data.careInfo.temperature}</p>
+                    <p className="text-[11px] text-foreground mt-0.5 leading-snug">{data.careInfo.temperature}</p>
                   </div>
                 </div>
               )}
@@ -231,14 +236,14 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
         )}
 
         {/* Recommendations */}
-        {data?.recommendations && data.recommendations.length > 0 && (
+        {data?.recommendations && data.recommendations.length > 0 && !isUnidentified && (
           <div className="space-y-2">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Rekomendasi Ahli</p>
             <ul className="space-y-2">
               {data.recommendations.map((item, i) => (
-                <li key={i} className="flex gap-2.5 bg-slate-50 dark:bg-zinc-900/50 p-3 rounded-xl border border-slate-100 dark:border-zinc-800">
+                <li key={i} className="flex gap-2.5 bg-secondary/50 p-3 rounded-xl border border-border">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300 leading-relaxed">{item}</span>
+                  <span className="text-xs font-medium text-foreground leading-relaxed">{item}</span>
                 </li>
               ))}
             </ul>
@@ -246,12 +251,12 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
         )}
 
         {/* Fun Fact */}
-        {data?.funFact && (
+        {data?.funFact && !isUnidentified && (
           <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-900/50 rounded-2xl p-4 flex gap-3 items-start">
             <Sparkles className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-[9px] font-bold text-purple-400 uppercase tracking-widest mb-1">Fakta Menarik</p>
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{data.funFact}</p>
+              <p className="text-xs text-foreground leading-relaxed">{data.funFact}</p>
             </div>
           </div>
         )}
@@ -267,21 +272,23 @@ export default function DiagnosticResult({ status, data, onReset }: DiagnosticRe
           <Button
             onClick={onReset}
             variant="outline"
-            className="flex-1 py-5 border-slate-200 dark:border-zinc-800 rounded-xl font-bold text-slate-600 dark:text-slate-300"
+            className="flex-1 py-5 border-border rounded-xl font-bold text-foreground hover:bg-accent"
           >
             <Camera className="w-4 h-4 mr-2" /> Scan Ulang
           </Button>
-          <Button
-            onClick={() =>
-              window.open(
-                `https://www.google.com/search?q=Perawatan+Anggrek+${data?.species || data?.commonName}`,
-                "_blank"
-              )
-            }
-            className="flex-1 py-5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-xl shadow-lg font-bold"
-          >
-            <Globe className="w-4 h-4 mr-2" /> Cari di Web
-          </Button>
+          {!isUnidentified && (
+            <Button
+              onClick={() =>
+                window.open(
+                  `https://www.google.com/search?q=Perawatan+Anggrek+${data?.species || data?.commonName}`,
+                  "_blank"
+                )
+              }
+              className="flex-1 py-5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-lg font-bold"
+            >
+              <Globe className="w-4 h-4 mr-2" /> Cari di Web
+            </Button>
+          )}
         </div>
       </div>
     </div>

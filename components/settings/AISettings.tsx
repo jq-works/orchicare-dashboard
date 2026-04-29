@@ -14,15 +14,15 @@ export default function AISettings() {
   ];
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-4 md:p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-        <h3 className="text-base md:text-lg font-bold text-foreground flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" /> Orchi-AI Lab Engine
+    <div className="bg-card border border-border rounded-[3rem] p-6 md:p-8 shadow-sm">
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-border">
+        <h3 className="text-xl md:text-2xl font-black text-foreground tracking-tight flex items-center gap-3">
+          <ShieldCheck className="w-6 h-6 text-emerald-500" /> Orchi-AI Lab Engine
         </h3>
       </div>
 
       <div className="space-y-4">
-        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest pl-1">Pilih Model Analisis</p>
+        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em] pl-1">Pilih Model Analisis</p>
         
         <div className="grid grid-cols-1 gap-3">
           {models.map((model) => {
@@ -33,27 +33,27 @@ export default function AISettings() {
                 key={model.id}
                 onClick={() => setSelectedModel(model.id)}
                 className={cn(
-                  "flex items-center justify-between p-4 border rounded-2xl transition-all duration-300 text-left",
+                  "flex items-center justify-between p-5 border rounded-[2rem] transition-all duration-300 text-left group active:scale-[0.98]",
                   isActive 
                     ? "bg-emerald-500/10 border-emerald-500 shadow-sm" 
-                    : "bg-background border-border hover:border-emerald-500/50"
+                    : "bg-background border-border hover:border-emerald-500/50 hover:bg-secondary/50"
                 )}
               >
                 <div className="flex items-center gap-4">
                   <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                    isActive ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"
+                    "w-12 h-12 rounded-[1.5rem] flex items-center justify-center shrink-0 transition-colors",
+                    isActive ? "bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "bg-muted text-muted-foreground group-hover:bg-emerald-500/20 group-hover:text-emerald-500"
                   )}>
-                    <Icon className="w-5 h-5" />
+                    <Icon className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className={cn("text-sm font-bold", isActive ? "text-emerald-600 dark:text-emerald-400" : "text-foreground")}>
+                    <p className={cn("text-base font-black tracking-tight", isActive ? "text-emerald-600 dark:text-emerald-400" : "text-foreground")}>
                       {model.name}
                     </p>
-                    <p className="text-[11px] text-muted-foreground">{model.desc}</p>
+                    <p className="text-xs font-medium text-muted-foreground mt-0.5">{model.desc}</p>
                   </div>
                 </div>
-                {isActive && <div className="w-2 h-2 rounded-full bg-emerald-500 mr-2" />}
+                {isActive && <div className="w-3 h-3 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />}
               </button>
             );
           })}

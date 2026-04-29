@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Activity, Battery, Zap, Sprout } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function ZoneStatsSummary({ totalZones }: { totalZones: number }) {
   return (
@@ -14,7 +15,14 @@ export default function ZoneStatsSummary({ totalZones }: { totalZones: number })
   );
 }
 
-function StatItem({ label, value, icon: Icon, color }: any) {
+interface StatItemProps {
+  label: string;
+  value: string | number;
+  icon: React.ElementType;
+  color: string;
+}
+
+function StatItem({ label, value, icon: Icon, color }: StatItemProps) {
   return (
     <div className="bg-card border border-border p-4 rounded-[2rem] flex flex-col md:flex-row items-center md:items-start gap-4 shadow-sm">
       <div className={cn("p-3 rounded-2xl bg-background border border-border shadow-sm", color)}>
@@ -26,8 +34,4 @@ function StatItem({ label, value, icon: Icon, color }: any) {
       </div>
     </div>
   );
-}
-
-function cn(...inputs: any) {
-  return inputs.filter(Boolean).join(" ");
-}
+}

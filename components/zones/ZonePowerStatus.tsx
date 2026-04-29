@@ -2,8 +2,9 @@
 
 import { Sun, BatteryCharging, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { ZoneData } from "@/app/zones/page";
 
-export default function ZonePowerStatus({ power }: { power: any }) {
+export default function ZonePowerStatus({ power }: { power: ZoneData["power"] }) {
   return (
     <div className="bg-secondary/30 rounded-[2rem] p-5 space-y-4 border border-border/30">
       <div className="flex justify-between items-center">

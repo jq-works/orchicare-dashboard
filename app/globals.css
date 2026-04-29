@@ -5,19 +5,56 @@
 /* Tailwind v4: aktifkan dark mode berbasis class (.dark di <html>), bukan media query */
 @variant dark (&:where(.dark, .dark *));
 
+body {
+  /* Menjaga konten tetap aman dari notch di atas dan bar di bawah */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Main Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1; /* slate-300 */
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background-color: #3f3f46; /* zinc-700 */
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #10b981; /* emerald-500 */
+}
+
+/* Thin Scrollbar (for components) */
 .scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
+  height: 6px;
 }
 .scrollbar-thin::-webkit-scrollbar-track {
   background: transparent;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
   background-color: #cbd5e1; /* slate-300 */
-  border-radius: 10px;
+  border-radius: 20px;
+  border: none;
+  background-clip: border-box;
 }
 .dark .scrollbar-thin::-webkit-scrollbar-thumb {
   background-color: #3f3f46; /* zinc-700 */
 }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: #10b981; /* emerald-500 */
+}
+
+
 
 @theme inline {
   --color-background: var(--background);

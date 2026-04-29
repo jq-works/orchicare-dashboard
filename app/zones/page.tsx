@@ -6,7 +6,26 @@ import ZoneCard from "@/components/zones/ZoneCard";
 import ZoneStatsSummary from "@/components/zones/ZoneStatsSummary";
 import AddNodeModal from "@/components/zones/AddNodeModal";
 
-const zonesData = [
+export interface ZoneData {
+  id: string;
+  name: string;
+  location: string;
+  healthStatus: string;
+  healthScore: number;
+  sensors: {
+    light: string;
+    temp: number;
+    humid: number;
+    soil: number;
+  };
+  power: {
+    battery: number;
+    solarStatus: string;
+    sunIntensity: string;
+  };
+}
+
+const zonesData: ZoneData[] = [
   {
     id: "ORCHI-NODE-01",
     name: "Zona Dendrobium A1",
@@ -18,12 +37,30 @@ const zonesData = [
   },
   {
     id: "ORCHI-NODE-02",
-    name: "Zona Phalaenopsis B3",
+    name: "Zona Phalaenopsis B2",
     location: "Area Outdoor Timur",
-    healthStatus: "Indikasi Jamur",
-    healthScore: 62,
-    sensors: { light: "Terlalu Terang", temp: 32.1, humid: 45, soil: 20 },
-    power: { battery: 15, solarStatus: "Active", sunIntensity: "Very High" }
+    healthStatus: "Offline",
+    healthScore: 0,
+    sensors: { light: "Offline", temp: 0, humid: 0, soil: 0 },
+    power: { battery: 0, solarStatus: "Disconnected", sunIntensity: "None" }
+  },
+  {
+    id: "ORCHI-NODE-03",
+    name: "Zona Vanda C2",
+    location: "Greenhouse Selatan",
+    healthStatus: "Kritis",
+    healthScore: 35,
+    sensors: { light: "Kurang", temp: 35.0, humid: 30, soil: 10 },
+    power: { battery: 5, solarStatus: "Disconnected", sunIntensity: "Low" }
+  },
+  {
+    id: "ORCHI-NODE-04",
+    name: "Zona Cattleya D4",
+    location: "Area Indoor Barat",
+    healthStatus: "Sehat",
+    healthScore: 88,
+    sensors: { light: "Optimal", temp: 26.0, humid: 70, soil: 55 },
+    power: { battery: 100, solarStatus: "Fully Charged", sunIntensity: "Medium" }
   }
 ];
 

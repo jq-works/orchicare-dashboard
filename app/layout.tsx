@@ -7,12 +7,28 @@ import { ThemeProvider } from '@/components/shared/ThemeProvider';
 import AIWelcomeModal from '@/components/dashboard/AIWelcomeModal';
 import FloatingChat from '@/components/shared/FloatingChat';
 import MobileTopBar from '@/components/shared/MobileTopBar';
+import type { Viewport } from "next";
 
 const inter = Inter({ subsets: ['latin'] });
+
+export const viewport: Viewport = {
+  themeColor: "#10b981",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover", // Agar konten masuk ke area notch/poni HP
+};
 
 export const metadata = {
   title: 'OrchiCare - Smart Orchid Monitoring',
   description: 'AI-Powered Agrotechnology for Greenhouse Excellence',
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "OrchiCare",
+  },
 };
 
 export default function RootLayout({

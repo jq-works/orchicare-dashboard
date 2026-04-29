@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/dashboard',
+        permanent: true, // Gunakan true agar SEO menganggap /dashboard sebagai halaman utama permanen
+      },
+    ]
+  },
 };
 
 export default nextConfig;

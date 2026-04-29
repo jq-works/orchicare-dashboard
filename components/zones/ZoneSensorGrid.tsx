@@ -2,8 +2,9 @@
 
 import { Thermometer, Droplets, Sprout, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { ZoneData } from "@/app/zones/page";
 
-export default function ZoneSensorGrid({ sensors }: { sensors: any }) {
+export default function ZoneSensorGrid({ sensors }: { sensors: ZoneData["sensors"] }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 py-6 border-y border-border/50">
       <SensorItem icon={Sun} label="Cahaya" value={sensors.light} color="text-amber-500" bg="bg-amber-500/10" />
@@ -14,7 +15,15 @@ export default function ZoneSensorGrid({ sensors }: { sensors: any }) {
   );
 }
 
-function SensorItem({ icon: Icon, label, value, color, bg }: any) {
+interface SensorItemProps {
+  icon: React.ElementType;
+  label: string;
+  value: string | number;
+  color: string;
+  bg: string;
+}
+
+function SensorItem({ icon: Icon, label, value, color, bg }: SensorItemProps) {
   return (
     <div className="flex flex-col items-center text-center space-y-2 group">
       <div className={cn("p-3 rounded-2xl border border-transparent group-hover:border-border group-hover:bg-background transition-all shadow-sm", bg, color)}>

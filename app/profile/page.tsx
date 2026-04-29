@@ -14,7 +14,7 @@ export default function ProfilePage() {
       
       {/* Header Halaman */}
       <div className="border-b border-border pb-4">
-        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
+        <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-foreground flex items-center gap-3">
           <User className="w-7 h-7 md:w-8 md:h-8 text-emerald-500" /> Profil Pengguna
         </h1>
         <p className="text-xs md:text-sm font-medium text-muted-foreground mt-2">

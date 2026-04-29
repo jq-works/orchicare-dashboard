@@ -5,12 +5,10 @@ import { usePathname } from "next/navigation";
 import { Home, LayoutGrid, Camera, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Menambahkan Settings kembali, sehingga total ada 5 item. 
-// AI Lab (index 2) otomatis berada tepat di tengah.
 const bottomNavItems = [
   { name: "Home", href: "/dashboard", icon: Home },
   { name: "Zonasi", href: "/zones", icon: LayoutGrid },
-  { name: "AI Lab", href: "/ai-lab", icon: Camera, isMain: true }, // Tandai sebagai tombol utama
+  { name: "AI Lab", href: "/ai-lab", icon: Camera, isMain: true },
   { name: "Setting", href: "/settings", icon: Settings },
   { name: "Profil", href: "/profile", icon: User },
 ];
@@ -19,8 +17,7 @@ export default function BottomBar() {
   const pathname = usePathname();
 
   return (
-    // Menggunakan bg-background dan border-border agar adaptif dengan Light/Dark Mode
-    <div className="flex items-center justify-around h-20 px-2 pb-safe bg-background border-t border-border shadow-[0_-5px_20px_-15px_rgba(0,0,0,0.3)] z-50">
+    <div className="flex items-center justify-around h-[88px] px-2 pb-safe bg-card border-t border-border shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-50">
       {bottomNavItems.map((item) => {
         const isActive = pathname === item.href;
 
@@ -37,20 +34,20 @@ export default function BottomBar() {
               }}
               className="relative flex flex-col items-center justify-center w-1/5 h-full group"
             >
-              {/* Lingkaran Bulat yang Melayang (FAB) */}
+              {/* Floating Action Button (FAB) */}
               <div className={cn(
-                "absolute -top-6 flex items-center justify-center w-14 h-14 rounded-full shadow-xl border-[4px] border-background transition-transform duration-300 active:scale-95",
+                "absolute -top-7 flex items-center justify-center w-[64px] h-[64px] rounded-[1.75rem] shadow-2xl border-[6px] border-card transition-all duration-300 active:scale-95 group-hover:-translate-y-1",
                 isActive 
-                  ? "bg-emerald-600 shadow-emerald-600/30" 
-                  : "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/30"
+                  ? "bg-emerald-600 shadow-emerald-600/40" 
+                  : "bg-emerald-500 hover:bg-emerald-400 shadow-emerald-500/30"
               )}>
                 <item.icon className="w-6 h-6 text-white" />
               </div>
               
-              {/* Teks AI Lab (Diturunkan agar tidak menabrak lingkaran) */}
+              {/* Teks AI Lab */}
               <span className={cn(
-                "mt-8 text-[10px] font-bold transition-all duration-300",
-                isActive ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground opacity-80"
+                "mt-9 text-[10px] uppercase tracking-wider transition-all duration-300",
+                isActive ? "text-emerald-600 dark:text-emerald-400 font-black" : "text-muted-foreground opacity-80 font-bold"
               )}>
                 {item.name}
               </span>
@@ -64,19 +61,24 @@ export default function BottomBar() {
             key={item.name}
             href={item.href}
             className={cn(
-              "flex flex-col items-center justify-center w-1/5 h-full space-y-1 transition-all",
-              isActive ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground hover:text-emerald-500"
+              "flex flex-col items-center justify-center w-1/5 h-full space-y-1.5 transition-all group",
+              isActive ? "text-emerald-600 dark:text-emerald-500" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <div className={cn(
-              "p-2 rounded-2xl transition-all duration-300",
-              isActive ? "bg-emerald-50 dark:bg-emerald-500/10" : "bg-transparent"
+              "p-2.5 rounded-[1rem] border transition-all duration-300",
+              isActive 
+                ? "bg-emerald-500/20 border-emerald-500/30 shadow-[inset_0_0_15px_rgba(16,185,129,0.1)]" 
+                : "bg-transparent border-transparent group-hover:bg-secondary/50 group-hover:border-border"
             )}>
-              <item.icon className={cn("w-6 h-6", isActive && "stroke-[2.5px]")} />
+              <item.icon className={cn(
+                "w-[22px] h-[22px] transition-colors", 
+                isActive && "stroke-[2.5px]"
+              )} />
             </div>
             <span className={cn(
-              "text-[10px] font-medium transition-all duration-300",
-              isActive ? "opacity-100 translate-y-0 font-bold" : "opacity-70 translate-y-1"
+              "text-[9px] uppercase tracking-widest transition-all duration-300",
+              isActive ? "opacity-100 font-black" : "opacity-70 font-bold"
             )}>
               {item.name}
             </span>

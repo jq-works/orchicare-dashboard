@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Bot, PhoneForwarded, User } from "lucide-react";
+import { MessageCircle, X, Send, Bot, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -16,15 +16,14 @@ interface ChatMessage {
 export default function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "1",
       sender: "bot",
-      text: "Halo! 👋 Saya asisten AI dari OrchiCare. Ada yang bisa saya bantu terkait kondisi greenhouse, jadwal penyiraman, atau panduan teknis alat ESP32?",
+      text: "Halo! 👋 Orchi-AI siap membantu. Ada yang bisa saya jelaskan terkait data sensor atau kondisi greenhouse hari ini?",
       time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -33,205 +32,180 @@ export default function FloatingChat() {
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, isTyping, isOpen]);
+  }, [messages, isLoading, isOpen]);
 
-  const handleSend = (text: string) => {
-    if (!text.trim()) return;
+  const handleSend = async (text: string) => {
+    if (!text.trim() || isLoading) return;
 
-    const newUserMsg: ChatMessage = {
+    const userMsg: ChatMessage = {
       id: Date.now().toString(),
       sender: "user",
       text: text,
       time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
     };
     
-    setMessages(prev => [...prev, newUserMsg]);
+    setMessages(prev => [...prev, userMsg]);
     setInputText("");
-    setIsTyping(true);
+    setIsLoading(true);
 
-    setTimeout(() => {
-      let botReply = "Maaf, saya masih dalam tahap purwarupa demo. Namun, saya terus belajar untuk membantu Anda mengelola anggrek dengan lebih baik!";
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: [...messages, userMsg] }),
+      });
       
-      const lowerText = text.toLowerCase();
+      const data = await res.json();
       
-      if (lowerText.includes("zona c") || lowerText.includes("panas")) {
-        botReply = "Mendeteksi anomali di Zona C: Suhu saat ini mencapai 34°C (Kritis). Sistem OrchiCare merekomendasikan aktivasi pompa air dan misting segera.";
-      } else if (lowerText.includes("cs") || lowerText.includes("manusia") || lowerText.includes("whatsapp")) {
-        botReply = "Baik, saya akan meneruskan sesi ini ke Customer Service manusia. Bot WhatsApp OrchiCare akan segera menghubungi nomor Anda.";
-      } else if (lowerText.includes("optimal") || lowerText.includes("sehat")) {
-        botReply = "Secara keseluruhan, Indeks Kesehatan Greenhouse Anda berada di angka 88 (Sangat Baik). Lanjutkan perawatan rutin!";
-      }
-
-      const newBotMsg: ChatMessage = {
+      const botMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: "bot",
-        text: botReply,
+        text: data.text,
         time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
       };
       
-      setMessages(prev => [...prev, newBotMsg]);
-      setIsTyping(false);
-    }, 1500); 
+      setMessages(prev => [...prev, botMsg]);
+    } catch (error) {
+      console.error("Chat Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    // 1. PERBAIKAN JARAK BAWAH: Menggunakan bottom-24 agar lebih lega dari bottom bar di HP
     <div className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-[60]">
       
-      {/* 2. PERBAIKAN ANIMASI JENDELA CHAT */}
+      {/* Chat Window */}
       <div 
         className={cn(
-          "absolute bottom-16 right-0 mb-2 origin-bottom-right transition-all duration-300 ease-out",
-          // Jika Buka: Skala 100%, Posisi Pas, Terlihat
+          "absolute bottom-20 right-0 origin-bottom-right transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden flex flex-col",
+          "border border-white/20 dark:border-white/10 shadow-[0_30px_60px_-15px_rgba(16,185,129,0.2)] bg-card/95 backdrop-blur-3xl rounded-[2rem]",
           isOpen 
-            ? "scale-100 opacity-100 translate-y-0 pointer-events-auto" 
-            // Jika Tutup: Skala mengecil sedikit (75%), turun ke bawah sedikit, dan memudar (tidak sampai hilang layoutnya)
-            : "scale-75 opacity-0 translate-y-4 pointer-events-none"
+            ? "scale-100 opacity-100 translate-y-0" 
+            : "scale-75 opacity-0 translate-y-10 pointer-events-none"
         )}
+        style={{ 
+          width: '340px', 
+          height: '450px', 
+          maxHeight: 'calc(100vh - 140px)', 
+          minHeight: '300px' 
+        }}
       >
-        <Card className="w-[320px] sm:w-[360px] overflow-hidden border-slate-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-950 flex flex-col">
           
-          <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 flex items-center justify-between shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl"></div>
-            
-            <div className="flex items-center gap-3 relative z-10">
-              <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm border border-white/30">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-bold text-white text-sm">Orchi-AI Assistant</h3>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="w-2 h-2 rounded-full bg-green-300 animate-pulse"></span>
-                  <span className="text-[10px] text-emerald-50 font-medium">Online & Cerdas</span>
-                </div>
+        {/* Header - AI Core Aesthetic */}
+        <div className="relative bg-emerald-950 p-3 flex items-center justify-between overflow-hidden border-b border-emerald-900/50 shrink-0">
+          {/* Grid Background */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:16px_16px]"></div>
+          
+          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-16 h-16 bg-emerald-500/30 rounded-full blur-2xl animate-pulse"></div>
+          
+          <div className="flex items-center gap-2.5 relative z-10 text-left">
+            <div className="relative flex items-center justify-center w-8 h-8">
+              <div className="absolute inset-0 border-2 border-emerald-500/20 rounded-full animate-[spin_4s_linear_infinite] border-t-emerald-400"></div>
+              <div className="bg-emerald-900/80 p-1.5 rounded-full border border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.5)] backdrop-blur-md">
+                <Bot className="w-3.5 h-3.5 text-emerald-400" />
               </div>
             </div>
-            
+            <div>
+              <h3 className="font-black text-white text-xs tracking-tight leading-none mb-1">Orchi-AI</h3>
+              <div className="flex items-center gap-1">
+                <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_5px_#34d399]"></span>
+                <span className="text-[6px] text-emerald-400 font-black uppercase tracking-widest">Active Engine</span>
+              </div>
+            </div>
+          </div>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-white hover:bg-white/10 rounded-lg h-6 w-6 relative z-10 shrink-0"
+            onClick={() => setIsOpen(false)}
+          >
+            <X className="w-3 h-3" />
+          </Button>
+        </div>
+
+        {/* Chat Body */}
+        <div className="flex-1 min-h-0 p-3 overflow-y-auto bg-gradient-to-b from-background/50 to-secondary/30 flex flex-col gap-2 scrollbar-thin">
+          {messages.map((msg) => (
+            <div key={msg.id} className={cn("flex items-end gap-1.5", msg.sender === "user" ? "flex-row-reverse" : "flex-row")}>
+              
+              {/* Avatar untuk Bot */}
+              {msg.sender === "bot" && (
+                <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 shadow-sm">
+                  <Sparkles size={8} />
+                </div>
+              )}
+
+              <div className={cn(
+                "p-2.5 shadow-sm text-[11px] font-semibold leading-relaxed max-w-[85%]",
+                msg.sender === "user"
+                  ? "bg-foreground text-background rounded-2xl rounded-br-none"
+                  : "bg-card border border-border text-foreground rounded-2xl rounded-bl-none text-left shadow-[0_2px_10px_rgba(0,0,0,0.02)]"
+              )}>
+                {msg.text}
+                <p className={cn("text-[6.5px] mt-1 font-black opacity-40 uppercase tracking-widest", msg.sender === "user" ? "text-right text-background" : "text-right text-muted-foreground")}>
+                  {msg.time}
+                </p>
+              </div>
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="flex items-center gap-2 animate-in fade-in">
+              <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 shadow-sm">
+                <Sparkles size={8} className="animate-pulse" />
+              </div>
+              <div className="bg-card border border-border rounded-2xl rounded-bl-none p-2 shadow-sm flex items-center gap-1.5">
+                <Loader2 size={10} className="animate-spin text-emerald-500" />
+                <span className="text-[7px] font-black text-muted-foreground uppercase tracking-widest">Berpikir...</span>
+              </div>
+            </div>
+          )}
+          
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <div className="p-3 bg-card/80 backdrop-blur-md border-t border-border shrink-0">
+          <div className="relative flex items-center gap-2">
+            <input 
+              type="text" 
+              placeholder="Tanya Orchi-AI..." 
+              className="flex-1 bg-secondary border-2 border-border rounded-[1.25rem] px-4 py-3 text-xs font-bold focus:outline-none focus:border-emerald-500 transition-all text-foreground shadow-inner"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSend(inputText)}
+              disabled={isLoading}
+            />
             <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:bg-white/20 hover:text-white rounded-full h-8 w-8 relative z-10"
-              onClick={() => setIsOpen(false)}
+              onClick={() => handleSend(inputText)}
+              className="rounded-full h-11 w-11 bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] shrink-0 transition-transform active:scale-95"
+              disabled={!inputText.trim() || isLoading}
             >
-              <X className="w-4 h-4" />
+              <Send className="w-4 h-4 ml-0.5" />
             </Button>
           </div>
-
-          <div className="h-[320px] p-4 overflow-y-auto bg-slate-50 dark:bg-zinc-900/50 flex flex-col gap-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-700">
-            
-            <div className="text-center mt-2 mb-2">
-              <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-200/50 dark:bg-zinc-800 px-2 py-1 rounded-full uppercase tracking-wider">
-                Hari ini
-              </span>
-            </div>
-
-            {messages.map((msg) => (
-              <div key={msg.id} className={cn("flex items-end gap-2 max-w-[85%]", msg.sender === "user" ? "ml-auto flex-row-reverse" : "mr-auto")}>
-                <div className={cn(
-                  "w-6 h-6 rounded-full flex items-center justify-center shrink-0 border",
-                  msg.sender === "user" 
-                    ? "bg-slate-200 dark:bg-zinc-800 border-slate-300 dark:border-zinc-700" 
-                    : "bg-emerald-100 dark:bg-emerald-900/50 border-emerald-200 dark:border-emerald-800"
-                )}>
-                  {msg.sender === "user" ? <User className="w-3.5 h-3.5 text-slate-500" /> : <Bot className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />}
-                </div>
-
-                <div className={cn(
-                  "p-3 shadow-sm",
-                  msg.sender === "user"
-                    ? "bg-emerald-600 text-white rounded-2xl rounded-br-sm"
-                    : "bg-white dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700/50 text-slate-700 dark:text-slate-300 rounded-2xl rounded-bl-sm"
-                )}>
-                  <p className="text-xs leading-relaxed">{msg.text}</p>
-                  <p className={cn("text-[9px] mt-1.5 text-right font-medium opacity-70", msg.sender === "user" ? "text-emerald-100" : "text-slate-400")}>
-                    {msg.time}
-                  </p>
-                </div>
-              </div>
-            ))}
-
-            {messages.length === 1 && (
-              <div className="pl-8 flex flex-col gap-2 mt-1">
-                <button 
-                  onClick={() => handleSend("Bagaimana kondisi Zona C saat ini?")}
-                  className="text-[11px] font-medium text-left text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 px-3 py-2 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors w-fit"
-                >
-                  📊 Cek Ringkasan Zona C
-                </button>
-                <button 
-                  onClick={() => handleSend("Tolong hubungkan saya ke CS Manusia via WhatsApp")}
-                  className="text-[11px] font-medium text-left text-slate-600 dark:text-slate-400 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-700/50 transition-colors w-fit flex items-center gap-1.5"
-                >
-                  <PhoneForwarded className="w-3 h-3" /> Hubungi CS Manusia
-                </button>
-              </div>
-            )}
-
-            {isTyping && (
-              <div className="flex items-end gap-2 max-w-[85%] mr-auto">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0 border border-emerald-200 dark:border-emerald-800">
-                  <Bot className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                <div className="bg-white dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700/50 p-3 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
-                </div>
-              </div>
-            )}
-            
-            <div ref={messagesEndRef} />
-          </div>
-
-          <div className="p-3 bg-white dark:bg-zinc-950 border-t border-slate-100 dark:border-zinc-800">
-            <form 
-              onSubmit={(e) => { e.preventDefault(); handleSend(inputText); }} 
-              className="flex items-center gap-2"
-            >
-              <input 
-                type="text" 
-                placeholder="Tanya Orchi-AI..." 
-                className="flex-1 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-slate-800 dark:text-slate-100 placeholder:text-slate-400"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                disabled={isTyping}
-              />
-              <Button 
-                type="submit" 
-                size="icon" 
-                className={cn(
-                  "rounded-full h-9 w-9 shrink-0 shadow-sm transition-all",
-                  inputText.trim() 
-                    ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
-                    : "bg-slate-200 dark:bg-zinc-800 text-slate-400"
-                )}
-                disabled={!inputText.trim() || isTyping}
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            </form>
-          </div>
-
-        </Card>
+        </div>
       </div>
 
-      {/* FAB Button (Absolute handling) */}
+      {/* Floating Toggle Button */}
       <Button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "relative w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 z-10",
+          "pointer-events-auto shrink-0 w-16 h-16 rounded-full shadow-[0_10px_40px_-10px_rgba(16,185,129,0.5)] flex items-center justify-center transition-all duration-500 hover:scale-105 active:scale-95 border-[4px] border-card",
           isOpen 
-            ? "bg-slate-200 hover:bg-slate-300 text-slate-600 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-slate-300 rotate-90" 
-            : "bg-emerald-600 hover:bg-emerald-700 text-white rotate-0"
+            ? "bg-secondary border-border text-foreground rotate-90" 
+            : "bg-emerald-500 text-white rotate-0"
         )}
       >
-        {isOpen ? <X className="w-6 h-6" /> : (
+        {isOpen ? <X className="w-7 h-7" /> : (
           <div className="relative">
-            <MessageCircle className="w-6 h-6" />
-            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-emerald-600"></span>
-            </span>
+            <MessageCircle className="w-7 h-7 stroke-[2.5px]" />
+            <div className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-300 border-2 border-emerald-500"></span>
+            </div>
           </div>
         )}
       </Button>

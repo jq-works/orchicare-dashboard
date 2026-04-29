@@ -1,56 +1,70 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { Router, Wifi, Share2, Server, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Cpu, Wifi, Save } from "lucide-react";
 
 export default function IoTSettings() {
   return (
-    <Card className="border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
-      <CardHeader className="border-b border-slate-100 dark:border-zinc-800/50 pb-4">
-        <CardTitle className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-          <Cpu className="w-5 h-5 text-emerald-500" /> Konfigurasi Hardware (ESP32)
-        </CardTitle>
-        <CardDescription className="text-slate-500 dark:text-slate-400">
-          Atur parameter koneksi MQTT dan kalibrasi sensor greenhouse.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">MQTT Broker URL</label>
-            <input 
-              type="text" 
-              defaultValue="mqtt://broker.hivemq.com" 
-              className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors text-slate-800 dark:text-slate-100"
-            />
+    <div className="bg-card border border-border rounded-2xl p-4 md:p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+        <h3 className="text-base md:text-lg font-bold text-foreground flex items-center gap-2">
+          <Router className="w-5 h-5 text-emerald-500" /> Jaringan Orchi-Gateway
+        </h3>
+      </div>
+
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-2 text-left">
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest pl-1">SSID Router Lokal</label>
+            <div className="relative">
+              <Wifi className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input type="text" defaultValue="OrchiCare_Hub_Moklet" className="w-full bg-background border border-border text-foreground text-sm rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-emerald-500/20 outline-none font-medium" />
+            </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Port Koneksi</label>
-            <input 
-              type="number" 
-              defaultValue="1883" 
-              className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 transition-colors text-slate-800 dark:text-slate-100"
-            />
+          <div className="space-y-2 text-left">
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest pl-1">Gateway IP Address</label>
+            <div className="relative">
+              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input type="text" defaultValue="192.168.1.1" className="w-full bg-background border border-border text-foreground text-sm rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-emerald-500/20 outline-none font-medium" />
+            </div>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-100 dark:border-zinc-800/50">
-          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
-            <Wifi className="w-4 h-4 text-blue-500" /> Interval Sinkronisasi
-          </h4>
-          <div className="flex items-center gap-4">
-            <input type="range" min="1" max="60" defaultValue="5" className="flex-1 accent-emerald-500" />
-            <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 w-16 text-right">5 Menit</span>
+        {/* Visualisasi Alat Terkoneksi */}
+        <div className="p-4 border border-border rounded-2xl bg-background/40">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase mb-4 tracking-widest">Node IoT Terdeteksi (3 Alat)</p>
+          <div className="space-y-3">
+            <ConnectedDevice name="OrchiNode-01 (Zone A)" status="Online" ip="192.168.1.15" />
+            <ConnectedDevice name="OrchiNode-02 (Zone B)" status="Online" ip="192.168.1.16" />
+            <ConnectedDevice name="OrchiNode-03 (Backup)" status="Standby" ip="192.168.1.17" />
           </div>
         </div>
 
-        <div className="pt-2 flex justify-end">
-          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
-            <Save className="w-4 h-4" /> Terapkan Konfigurasi
-          </Button>
+        <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-11 font-bold">
+          Update Konfigurasi Jaringan
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function ConnectedDevice({ name, status, ip }: { name: string; status: string; ip: string }) {
+  return (
+    <div className="flex items-center justify-between p-3 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-emerald-500/10 rounded-lg">
+          <Server className="w-4 h-4 text-emerald-500" />
         </div>
-      </CardContent>
-    </Card>
+        <div className="text-left">
+          <p className="text-xs font-bold text-foreground">{name}</p>
+          <p className="text-[10px] text-muted-foreground">{ip}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className={`w-2 h-2 rounded-full ${status === 'Online' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
+        <span className="text-[10px] font-bold text-muted-foreground">{status}</span>
+      </div>
+    </div>
   );
 }

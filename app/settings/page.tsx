@@ -1,51 +1,36 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings } from "lucide-react";
-import ProfileSettings from "@/components/settings/ProfileSettings";
+import { Settings, ShieldCheck } from "lucide-react";
 import IoTSettings from "@/components/settings/IoTSettings";
+import EnergySettings from "@/components/settings/EnergySettings";
 import AISettings from "@/components/settings/AISettings";
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 max-w-4xl mx-auto">
+    <div className="animate-in fade-in duration-500 max-w-4xl mx-auto px-4 md:px-0 pb-28 md:pb-10 pt-4 md:pt-0 space-y-6">
       
-      <div className="border-b border-slate-200 dark:border-zinc-800 pb-4">
-        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-3">
-          <Settings className="w-8 h-8 text-emerald-500" /> Konfigurasi Sistem
-        </h1>
-        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-2">
-          Kelola preferensi akun, integrasi hardware ESP32, dan automasi AI OrchiCare.
-        </p>
+      {/* Header Halaman */}
+      <div className="border-b border-border pb-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
+              <Settings className="w-7 h-7 text-emerald-500" /> Konfigurasi Sistem
+            </h1>
+            <p className="text-xs md:text-sm font-medium text-muted-foreground mt-1">
+              Manajemen Gateway, Efisiensi Daya Solar, dan Intelligence Engine.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl">
+             <ShieldCheck className="w-4 h-4 text-emerald-500" />
+             <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">System Secured</span>
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="profile" className="w-full">
-        {/* Tab Navigasi */}
-        <TabsList className="grid w-full grid-cols-3 mb-8 bg-slate-100 dark:bg-zinc-900/50 p-1 rounded-xl">
-          <TabsTrigger value="profile" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-sm transition-all">
-            Profil
-          </TabsTrigger>
-          <TabsTrigger value="iot" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-sm transition-all">
-            Hardware & IoT
-          </TabsTrigger>
-          <TabsTrigger value="ai" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-emerald-600 dark:data-[state=active]:text-emerald-400 data-[state=active]:shadow-sm transition-all">
-            Orchi-AI
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Konten Tab yang Dipisah */}
-        <TabsContent value="profile" className="mt-0 outline-none">
-          <ProfileSettings />
-        </TabsContent>
-
-        <TabsContent value="iot" className="mt-0 outline-none">
-          <IoTSettings />
-        </TabsContent>
-
-        <TabsContent value="ai" className="mt-0 outline-none">
-          <AISettings />
-        </TabsContent>
-      </Tabs>
+      {/* Assembly Komponen Berdasarkan Prioritas */}
+      <IoTSettings />
+      <EnergySettings />
+      <AISettings />
 
     </div>
   );

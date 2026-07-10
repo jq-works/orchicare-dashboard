@@ -23,6 +23,12 @@ export interface ZoneData {
     solarStatus: string;
     sunIntensity: string;
   };
+  relays: {
+    pump: boolean; // air untuk tanah
+    mist: boolean; // pengembunan
+    fan: boolean;  // kipas
+  };
+  aiAutoRelay: boolean;
 }
 
 const zonesData: ZoneData[] = [
@@ -33,7 +39,9 @@ const zonesData: ZoneData[] = [
     healthStatus: "Sehat",
     healthScore: 94,
     sensors: { light: "Optimal", temp: 28.5, humid: 62, soil: 45 },
-    power: { battery: 85, solarStatus: "Charging", sunIntensity: "High" }
+    power: { battery: 85, solarStatus: "Charging", sunIntensity: "High" },
+    relays: { pump: false, mist: true, fan: true },
+    aiAutoRelay: true
   },
   {
     id: "ORCHI-NODE-02",
@@ -42,7 +50,9 @@ const zonesData: ZoneData[] = [
     healthStatus: "Offline",
     healthScore: 0,
     sensors: { light: "Offline", temp: 0, humid: 0, soil: 0 },
-    power: { battery: 0, solarStatus: "Disconnected", sunIntensity: "None" }
+    power: { battery: 0, solarStatus: "Disconnected", sunIntensity: "None" },
+    relays: { pump: false, mist: false, fan: false },
+    aiAutoRelay: false
   },
   {
     id: "ORCHI-NODE-03",
@@ -51,7 +61,9 @@ const zonesData: ZoneData[] = [
     healthStatus: "Kritis",
     healthScore: 35,
     sensors: { light: "Kurang", temp: 35.0, humid: 30, soil: 10 },
-    power: { battery: 5, solarStatus: "Disconnected", sunIntensity: "Low" }
+    power: { battery: 5, solarStatus: "Disconnected", sunIntensity: "Low" },
+    relays: { pump: true, mist: false, fan: false },
+    aiAutoRelay: false
   },
   {
     id: "ORCHI-NODE-04",
@@ -60,7 +72,9 @@ const zonesData: ZoneData[] = [
     healthStatus: "Sehat",
     healthScore: 88,
     sensors: { light: "Optimal", temp: 26.0, humid: 70, soil: 55 },
-    power: { battery: 100, solarStatus: "Fully Charged", sunIntensity: "Medium" }
+    power: { battery: 100, solarStatus: "Fully Charged", sunIntensity: "Medium" },
+    relays: { pump: false, mist: false, fan: false },
+    aiAutoRelay: false
   }
 ];
 

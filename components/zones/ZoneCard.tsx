@@ -3,6 +3,7 @@
 import { MapPin, ChevronRight, Activity, ShieldCheck, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ZoneSensorGrid from "./ZoneSensorGrid";
+import ZoneRelayControl from "./ZoneRelayControl";
 import ZonePowerStatus from "./ZonePowerStatus";
 import type { ZoneData } from "@/app/zones/page";
 
@@ -64,6 +65,9 @@ export default function ZoneCard({ zone }: { zone: ZoneData }) {
 
         {/* SENSOR GRID */}
         <ZoneSensorGrid sensors={zone.sensors} />
+
+        {/* RELAY CONTROL */}
+        <ZoneRelayControl relays={zone.relays} aiAutoRelay={zone.aiAutoRelay} />
 
         {/* POWER & SOLAR */}
         <ZonePowerStatus power={zone.power} />
